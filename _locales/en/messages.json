@@ -1,0 +1,22 @@
+{
+	"name": {
+		"message":"Fullscreen address bar",
+		"description":"Extension name"
+	},
+	"description": {
+		"message":"Full-screen mode (f11), address bar (f6), switching tabs (ctr + up | down), the bookmark list, a new tab, context menu.",
+		"description":"About extension"
+	},
+	"newTab": {
+		"message":"New tab",
+		"description":"New tab in context menu"
+	},
+	"blankTabTitle": {
+		"message":"<Blank>",
+		"description":"Output for blank title page"
+	},
+	"contextMenuTitle": {
+		"message":"Tabs",
+		"description":"Name context menu"
+	}
+}

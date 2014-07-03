@@ -1,0 +1,22 @@
+{
+	"name": {
+		"message":"Fullscreen address bar",
+		"description":"Extension name"
+	},
+	"description": {
+		"message":"Полноэкраный режим (f11), строка адреса (f6), переключение табов ( ctr+up|down ), список закладок, новая вкладка, контекстное меню.",
+		"description":"About extension"
+	},
+	"newTab": {
+		"message":"Новая вкладка",
+		"description":"New tab in context menu"
+	},
+	"blankTabTitle": {
+		"message":"<Без заголовка>",
+		"description":"Output for blank title page"
+	},
+	"contextMenuTitle": {
+		"message":"Вкладки",
+		"description":"Name context menu"
+	}
+}
