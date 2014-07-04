@@ -9,11 +9,23 @@ var currentWindowId = undefined;
 
 var _updateTabListTimer = undefined;
 var _updateTabListLocked = false;
+
+// Analitics
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-52536641-1']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+  var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+  ga.src = 'https://ssl.google-analytics.com/ga.js';
+  var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+
+
 var requestTabList = function(){
 	_updateTabListLocked = true;
 
 	chrome.windows.getCurrent({}, function(wnd){
-		console.log(wnd);
 		chrome.tabs.query({}, function(tabs) {
 			var currentWindowTabs = [];
 			var otherWindowTabs = [];
@@ -67,6 +79,8 @@ chrome.extension.onMessage.addListener(function(data, sender, sendResponse){
 	break;
 	case 'newtab':
 		chrome.tabs.create({ 'url' :chrome.extension.getURL('newtab.html') });
+		
+		_gaq.push(['_trackEvent', 'newtab', 'clicked']);
 	break;
 	case 'event':
 		switch( data.e.eventType ){
@@ -165,6 +179,8 @@ chrome.contextMenus.onClicked.addListener(function(menuItem, tab){
 		openTab(tabId);
 	} else if (menuItem.menuItemId == contextMenuId+'newtab') {
 		chrome.tabs.create({ 'url' :chrome.extension.getURL('newtab.html') });
+		
+		_gaq.push(['_trackEvent', 'newtab', 'clicked']);
 	}
 });
 
@@ -182,3 +198,5 @@ chrome.windows.onFocusChanged.addListener(function(){
 		}
 	});
 });
+
+_gaq.push(['_trackEvent', 'loaded', 'clicked']);
