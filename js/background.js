@@ -57,6 +57,8 @@ var openTab = function(tabId){
 				chrome.windows.update(tab.windowId, {focused: true}, function(){
 					chrome.tabs.update( tabId, {selected: true} );
 				});
+
+				_gaq.push(['_trackEvent', 'switchtab', 'clicked']);
 			}
 		});
 	};
