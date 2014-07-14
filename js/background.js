@@ -6,6 +6,7 @@ var contextMenuContext = ["all"];
 var contextMenuAlias = {};
 
 var currentWindowId = undefined;
+var currentWindowFullscreen = false;
 
 var _updateTabListTimer = undefined;
 var _updateTabListLocked = false;
@@ -37,6 +38,10 @@ var requestTabList = function(){
 				}
 			}
 			tabsList = currentWindowTabs.concat(otherWindowTabs);
+			dictionary.update({
+				array: tabsList,
+				keys: ['title','url']
+			});
 			updateContextMenu();
 			_updateTabListLocked = false;
 		});
@@ -73,8 +78,12 @@ chrome.extension.onMessage.addListener(function(data, sender, sendResponse){
 	var self = this;
 	switch( data.query ){
 	case 'list':
-		chrome.tabs.sendMessage(sender.tab.id, {query: 'list', body: tabsList}, null);
-		updateContextMenu();
+		chrome.tabs.sendMessage(sender.tab.id, {
+			query: 'list', 
+			suggest: data.suggest, 
+			body: dictionary.suggest(data.suggest)
+		}, null);
+		//updateContextMenu();
 	break;
 	case 'tab':
 		openTab(parseInt(data.id));
@@ -106,6 +115,7 @@ chrome.extension.onMessage.addListener(function(data, sender, sendResponse){
 		chrome.windows.getCurrent({}, function(wnd){
 			if (wnd.id != -1) {
 				var fullscreen = ( wnd.state == 'fullscreen' );
+				currentWindowFullscreen = fullscreen;
 				chrome.tabs.query({
 					windowId: wnd.id
 				}, function(tabs){
@@ -130,7 +140,7 @@ var updateContextMenu = function(){
 			contexts: contextMenuContext
 		});
 		chrome.contextMenus.create({
-			id: contextMenuId+'newtab',
+			id: contextMenuId+':newtab',
 			parentId: contextMenuId,
 			title: chrome.i18n.getMessage("newTab"),
 			contexts: contextMenuContext
@@ -160,7 +170,7 @@ var updateContextMenu = function(){
 				}
 
 				contextMenuInc++;
-				var contextItemId = contextMenuId+'-'+contextMenuInc;
+				var contextItemId = contextMenuId+':'+tabsList[i].id;
 				contextMenuList.push(chrome.contextMenus.create({
 					id: contextItemId,
 					parentId: contextMenuId,
@@ -176,11 +186,20 @@ var updateContextMenu = function(){
 requestTabList();
 
 chrome.contextMenus.onClicked.addListener(function(menuItem, tab){
-	var tabId = contextMenuAlias[menuItem.menuItemId];
-	if (tabId) {
-		openTab(tabId);
-	} else if (menuItem.menuItemId == contextMenuId+'newtab') {
-		chrome.tabs.create({ 'url' :chrome.extension.getURL('newtab.html') });
+	var tabId = String(menuItem.menuItemId).split(":");
+	if ( tabId.length == 2 ) {
+		tabId = tabId[1];
+	} else {
+		tabId = false;
+	}
+	if ( parseInt(tabId) && !(tabId=="newtab") ) {
+		openTab(parseInt(tabId));
+	} else if (tabId=="newtab") {
+		if (currentWindowFullscreen){
+			chrome.tabs.create({ 'url' :chrome.extension.getURL('newtab.html') });
+		} else {
+			chrome.tabs.create({ 'url': 'chrome://newtab' });
+		}
 		
 		_gaq.push(['_trackEvent', 'newtab', 'clicked']);
 	}

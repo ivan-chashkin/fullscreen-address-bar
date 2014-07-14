@@ -224,10 +224,17 @@
 #fullScreener_Tabs{
 	position:relative;
 	margin:0px 0px 0px 0px;
-	display:inline-block;
+	display:block;
 	text-align:left;
+	background: rgba(0,0,0,0.7);
+	width: 45vw;
+	margin: 0 auto;
+	font-size: 1.1vw;
+	overflow: hidden;
 }
 #fullScreener_Tabs_Bg{
+	display: none;
+	/*
 	position:absolute;
 	left:0px;
 	top:0px;
@@ -235,29 +242,28 @@
 	height:100%;
 	background:#000000;
 	opacity:0.7;
+	*/
 }
 #fullScreener_Tabs ul{
 	position:relative;
-	margin:8px;
-	padding:5px 5px 5px 5px;
+	margin:0.5vw;
+	padding:0.5vw;
 	list-style:none;
 	color:#eeeeee;
-	font-size:17px;
 	font-family:Helvetica, Calibri, sans-serif;
 	overflow:auto;
 	overflow-x:hidden;
-	max-height:450px;
+	height:80vh;
 	background:none;
 	-webkit-font-smoothing: antialiased;
 }
 #fullScreener_Tabs ul li{
 	position:static;
-	margin:0px 0px 0px 0px;
-	padding:3px 5px 3px 25px;
+	margin:0;
+	padding:0.3vw 0.5vh 0.3vw 2vw;
 	white-space:nowrap;
 	overflow:hidden;
 	text-overflow: ellipsis;
-	max-width:450px;
 	cursor:default;
 	height:auto;
 	background:none;
@@ -276,11 +282,11 @@
 	color:#333333;
 }
 #fullScreener_Tabs .fullScreener_favicon{
-	width:16px;
-	height:16px;
+	width:1.3vw;
+	height:1.3vw;
 	position:absolute;
-	margin:3px 0px 0px -20px;
-	background-size: 16px 16px;
+	margin:0.02vh 0px 0px -1.6vw;
+	background-size: 1.3vw 1.3vw;
 }
 
 
@@ -330,4 +336,22 @@
 }
 #fullScreener_tree ul li a:hover{
 	text-decoration:underline;
+}
+
+#fullScreener_Tabs_Form{
+	display: block;
+	margin:0.5vw;
+	padding:0.5vw;
+}
+#fullScreener_Tabs_Form input{
+	margin: 0;
+	padding: 0;
+	background: transparent;
+	font-size: 1.1vw;
+	color: #ffffff;
+	border: none;
+	width: 100%;
+}
+#fullScreener_Tabs_Form input:focus{
+	outline: none;
 }

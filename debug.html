@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title></title>
+	<script type="text/javascript" src="js/debug/tabs.js"></script>
+	<script type="text/javascript" src="js/underscore.js"></script>
+	<script type="text/javascript" src="js/dictionary.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+dictionary.update({
+	array: tabsList, 
+	keys: ['title','url']
+});
+
+console.log(dictionary.suggest('mail'))
+
+</script>
+</body>
+</html>

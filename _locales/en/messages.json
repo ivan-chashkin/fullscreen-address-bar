@@ -18,5 +18,9 @@
 	"contextMenuTitle": {
 		"message":"Tabs",
 		"description":"Name context menu"
+	},
+	"placeholderSuggest": {
+		"message":"Start typing the name of the tab...",
+		"description":"Placeholder on input tab"
 	}
 }

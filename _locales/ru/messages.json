@@ -18,5 +18,9 @@
 	"contextMenuTitle": {
 		"message":"Вкладки",
 		"description":"Name context menu"
+	},
+	"placeholderSuggest": {
+		"message":"Начните вводить название вкладки...",
+		"description":"Placeholder on input tab"
 	}
 }

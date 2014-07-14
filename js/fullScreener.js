@@ -42,6 +42,7 @@ for ( var i = 0; i < embeds.length; i++ ){
 if( window === window.parent ){
 
 var FS433_state = false;
+var FS433_fullscreen = false;
 var FS433_ready = false;
 var FS433_interval = false;
 var FS433_timer = false;
@@ -50,6 +51,14 @@ var FS433_topOffset = 20;
 var FS433_Favs_Obj = {};
 var FS433_tabs = [];
 var FS433_reg=/^(http|https|ftp|file){1}:\/\/(([0-9a-zA-Z\-]*\.)*)*(aero|biz|com|coop|edu|eu|gov|info|int|mil|museum|name|net|org|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cu|cv|cx|cy|cz|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|mg|mh|mk|ml|mm|mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|sk|sl|sm|sn|so|sr|st|su|sv|sy|sz|tc|td|tf|tg|th|tj|tk|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|um|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw)(\/){1}.*$/
+
+var FS433_KEY_ACTIVATE = 190;
+var FS433_KEY_ACTIVATE2 = 192;
+var FS433_KEY_CTRL = 17;
+var FS433_KEY_ESC = 27;
+var FS433_KEY_UP = 38;
+var FS433_KEY_DOWN = 40;
+var FS433_KEY_ENTER = 13;
 
 /* Favorites */
 FS433_renderFavorites = function(tree) {
@@ -327,11 +336,14 @@ var FS433_init = function(){
 	});
 	FS433_ready = true;
 };
-chrome.runtime.onMessage.addListener(function(data, sender, sendResponse) {
+chrome.extension.onMessage.addListener(function(data, sender, sendResponse) {
 	if ((data.query == 'list')&&FS433_state) {
 		FS433_tabs = data.body; 
+		FS433_suggested = data.suggest; 
 		FS433_showTabs();
 		FS433_Tabs_Obj.table.style.display = 'table';
+
+		FS433_Tabs_Obj.suggest.focus();
 	} else if (data.query == 'fullscreen') {
 		FS433_fullscreen_change(data.status);
 	} else if ((data.query == 'favorites')&&FS433_state) {
@@ -340,7 +352,11 @@ chrome.runtime.onMessage.addListener(function(data, sender, sendResponse) {
 });
 var FS433_fullscreen_change = function(fullscreen){
 	if( fullscreen ){
+		if ( !FS433_state ) {
+			FS433_hideTabs();
+		}
 		FS433_state = true;
+		FS433_fullscreen = fullscreen;
 		if( !document.getElementById('fullScreener_Bar') ){
 			FS433_ready = false;
 			FS433_init();
@@ -348,6 +364,9 @@ var FS433_fullscreen_change = function(fullscreen){
 			FS433_show_go();
 		}
 	} else {
+		if ( FS433_state ) {
+			FS433_hideTabs();
+		}
 		FS433_state = false;
 	}
 };
@@ -377,40 +396,22 @@ var FS433_initTabs = function(){
 		var tbody = document.createElement('tbody');
 		var tr = document.createElement('tr');
 		var td = document.createElement('td');
+		
 		var div1 = document.createElement('div');
 		div1.setAttribute('id', 'fullScreener_Tabs');
+		
 		var div2 = document.createElement('div');
 		div2.setAttribute('id', 'fullScreener_Tabs_Bg');
+
+		var form = document.createElement('form');
+		form.setAttribute('id', 'fullScreener_Tabs_Form');
+
+		form.innerHTML = '<input id="fullScreener_Tabs_Suggest" type="text" placeholder="'+chrome.i18n.getMessage("placeholderSuggest")+'" />';
+
+		FS433_Tabs_Obj.form = form;
+		FS433_Tabs_Obj.suggest = form.querySelector('input[type="text"]');
+
 		FS433_Tabs_Obj.ul = document.createElement('ul');
-		
-		// var t13 = document.createElement('a');
-		// t13.setAttribute('id', 'fullScreener_supported');
-		// t13.setAttribute('href', 'http://zenmoney.ru/');
-		// t13.setAttribute('target', '_blank');
-		/*
-		FS433_Tabs_Obj.ul.onmouseover = function(e){
-			if( e.target.tagName == 'LI' ){
-				var child = FS433_Tabs_Obj.ul.children;
-				var length = child.length;
-				for (var i = 0; i < length; i++) {
-					if( child[i] === e.target ){
-						child[i].className = 'fullScreener_hover';
-					}else{
-						child[i].className = '';
-					}
-				}
-				//var h = parseInt( e.target.getAttribute('rel') );
-				//FS433_Tabs_Obj.hover = FS433_Tabs_Obj.liKey[ h ].id;
-			}
-		}
-		FS433_Tabs_Obj.ul.onmouseout = function(e){
-			if( e.target.tagName == 'LI' ){
-				FS433_Tabs_Obj.li[FS433_Tabs_Obj.hover].className = '';
-				//FS433_Tabs_Obj.li[FS433_Tabs_Obj.active].className = 'fullScreener_hover';
-				FS433_Tabs_Obj.hover = FS433_Tabs_Obj.active;
-			}
-		}
-		*/
 		
 		FS433_Tabs_Obj.ul.onclick = function(e){
 			if( e.target.tagName == 'LI' ){
@@ -420,16 +421,47 @@ var FS433_initTabs = function(){
 			}
 		}
 		FS433_Tabs_Obj.init = true;
+
+		FS433_Tabs_Obj.form.addEventListener('submit', function(evt){
+			evt.preventDefault();
+			evt.stopPropagation();
+			FS433_hideTabs();
+			var li = FS433_Tabs_Obj.ul.querySelector('.fullScreener_hover');
+			FS433_Tabs_Obj.suggest.value = '';
+			if (li){
+				var tab = li.getAttribute('rel');
+				chrome.extension.sendMessage({query: 'tab', id:tab});
+			}
+		});
+		FS433_Tabs_Obj.suggest.addEventListener('keydown', function(evt){
+			switch (evt.keyCode) {
+				case FS433_KEY_DOWN:
+					evt.stopPropagation();
+					evt.preventDefault();
+					FS433_Tabs_Down();
+				break;
+				case FS433_KEY_UP:
+					evt.stopPropagation();
+					evt.preventDefault();
+					FS433_Tabs_Up();
+				break;
+			}
+		});
+		FS433_Tabs_Obj.suggest.addEventListener('input', function(evt){
+			chrome.extension.sendMessage({query: 'list', suggest:FS433_Tabs_Obj.suggest.value});
+		});
 		
 		FS433_Tabs_Obj.table.appendChild(tbody);
 		tbody.appendChild(tr);
 		tr.appendChild(td);
 		td.appendChild(div1);
 		div1.appendChild(div2);
+		div1.appendChild(form);
 		div1.appendChild(FS433_Tabs_Obj.ul);
 		//div1.appendChild(t13);
 		
 		FS433_Tabs_Obj.table.onclick = function(){
+			FS433_tabstatus = false;
 			FS433_hideTabs();
 		}
 		div1.onclick = function(e){
@@ -449,7 +481,7 @@ var FS433_initTabs = function(){
 	}
 	for ( var i = 0; i < FS433_tabs.length; i++ ){
 		FS433_Tabs_Obj.li[i] = document.createElement('li');
-		if( FS433_tabs[i].selected ){
+		if( FS433_tabs[i].selected && !FS433_suggested ){
 			FS433_Tabs_Obj.li[i].setAttribute('id', 'fullScreener_ActiveTab');
 			FS433_Tabs_Obj.active = i;
 			FS433_Tabs_Obj.hover = i;
@@ -474,6 +506,11 @@ var FS433_initTabs = function(){
 		
 		FS433_Tabs_Obj.ul.appendChild(FS433_Tabs_Obj.li[i]);
 	}
+
+	if (FS433_suggested) {
+		FS433_Tabs_Obj.hover = 0;
+		FS433_Tabs_Obj.li[0].className = 'fullScreener_hover';
+	}
 	
 	// FS433_Tabs_Obj.table.style.display = 'table';
 	/*  */
@@ -494,8 +531,10 @@ var FS433_showTabs = function(){
 var FS433_hideTabs = function(){
 	if( FS433_Tabs_Obj.init ){
 		FS433_Tabs_Obj.table.style.display = 'none';
+		FS433_Tabs_Obj.suggest.value = '';
 	}
 	FS433_tabsready = false;
+	FS433_tabstatus = false;
 }
 var FS433_Tabs_Up = function(){
 	if( FS433_Tabs_Obj.table.style.display != 'table' ){
@@ -558,31 +597,45 @@ window.addEventListener('keydown', function(e){
 		e.stopPropagation();
 		return false;
 	}
-	if( ( e.keyCode == 17 ) && FS433_state ){
+	if( ( e.keyCode == FS433_KEY_CTRL ) && FS433_state ){
 	//if( ( e.keyCode == 17 ) ){
 		if( !FS433_tabstatus ){
 			FS433_tabstatus = true;
 			FS433_tabtimer = setTimeout(function(){ chrome.runtime.sendMessage({query: 'list'}, function(tabsList){ FS433_tabs = tabsList; FS433_showTabs(); }); }, 100);
 		}
 	}
-	if( e.ctrlKey && FS433_state ){
+	if (FS433_tabstatus && FS433_tabsready) {
 	//if( e.ctrlKey ){
-		if( FS433_tabsready ){
-			switch( e.keyCode ){
-			case 38: // up
-				FS433_Tabs_Up();
-			break;
-			case 40: // down
-				FS433_Tabs_Down();
-			break;
-			}
+		switch( e.keyCode ){
+		case FS433_KEY_UP: // up
+			e.preventDefault();
+			FS433_Tabs_Up();
+		break;
+		case FS433_KEY_DOWN: // down
+			e.preventDefault();
+			FS433_Tabs_Down();
+		break;
 		}
+	}
+	if( ((e.keyCode == FS433_KEY_ACTIVATE)||(e.keyCode == FS433_KEY_ACTIVATE2)) && e.metaKey && (e.keyIdentifier!="U+0060") ){
+		if( !FS433_tabstatus ){
+			FS433_tabstatus = true;
+			FS433_state = true;
+			chrome.extension.sendMessage({query: 'list'}, null);
+		}
+	}
+	if (e.keyCode == FS433_KEY_ESC) {
+		if (FS433_tabstatus) {
+			e.preventDefault();
+		}
+		FS433_tabstatus = false;
+		FS433_hideTabs();
 	}
 });
 
 window.addEventListener('keyup', function(e){
-	if( e.keyCode == 17 ){
-		if( FS433_tabstatus ){
+	if( e.keyCode == FS433_KEY_CTRL ){
+		if( FS433_tabstatus && FS433_fullscreen ){
 			FS433_tabstatus = false;
 			clearTimeout(FS433_tabtimer);
 			if( 
